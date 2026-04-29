@@ -57,7 +57,7 @@
                     --flash-attn \
                     --mlock \
                     --threads 8
-                    --context 8192 o -c
+                    --ctx-size 8192 o -c
         
         Caso B: el modelo NO cabe en la eGPU
             ./llama-cli -m modelo_70b.gguf \
@@ -65,9 +65,9 @@
                     --flash-attn \
                     --mlock \
                     --threads 12 \
-                    --context 4096 o -c
+                    --ctx-size 4096 o -c
 
-    Como es una EGPU , recomiendan usar o contexto extremadamente altos ya que hay que evitar el intercambio de datos por el cable ( oculink funcionará algo mejor)
+    Como es una EGPU , recomiendan no usar contexto extremadamente altos ya que hay que evitar el intercambio de datos por el cable ( oculink funcionará algo mejor)
     Cuantización:
         Con una radeon 9070 xt 16 GB lo ideal serían los modelos Q5_K_M o Q6_K aunque si se quiere más contexto los Q4_K_M
 
@@ -78,7 +78,7 @@
         --threads 12 \
         --split-mode row \
         --mlock \
-        --context 8192
+        --ctx-size 8192
 
 '
 echo 'Hola'
