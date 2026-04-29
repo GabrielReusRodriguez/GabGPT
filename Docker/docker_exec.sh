@@ -34,7 +34,7 @@
         --env       => Definimos variables de entorno DENTRO del docker.
 
 
-        
+
         probar con --gpus
 
 '
@@ -50,8 +50,10 @@ docker run -it                  \
         --ipc=host              \
         --shm-size 8g           \
         --publish   ${DOCKER_PORT}:${HOST_PORT}   \
-        --volume ${HOST_MODELS_FOLDER}/${MODEL_FILE}:/app/llama.cpp/models/${MODEL_FILE}    \
+#        --volume ${HOST_MODELS_FOLDER}/${MODEL_FILE}:/app/llama.cpp/models/${MODEL_FILE}    \
         --env  MODEL_PATH=/app/llama.cpp/models/${MODEL_FILE}  \
         --env  N_GPU_LAYERS=${LLM_NUMBER_GPU_LAYERS} \
         --env  CTX_SIZE=${LLM_CONTEXT_SIZE}   \
         ${DOCKER_IMAGE_NAME}
+
+# Si descargamos el modelo en la Dockerfile no hace falta montar el volumen.

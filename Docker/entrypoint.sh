@@ -16,7 +16,7 @@
 #TODO: Configurar los chat-models y los stops...
 
 # Ejecutamos el servidor
-exec /app/llama.cpp/build/bin/llama.cpp.server \
+exec /app/llama.cpp/build/bin/llama-server \
     --model "${LLAMA_MODEL_PATH}" \
     --host 0.0.0.0 \
     --port ${HOST_PORT} \

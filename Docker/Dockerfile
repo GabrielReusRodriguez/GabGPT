@@ -1,13 +1,14 @@
 # https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html
 
 # Usamos una imagen base con ROCm (para AMD GPU)
-FROM rocm/dev-ubuntu-24.04:latest
+#FROM rocm/dev-ubuntu-24.04:latest
+FROM rocm/rocm-terminal:latest
 # TODO: Probar con rocm/rocm-terminal:latest e instalando las librerias hipblas-dev y rocblas-dev
 
 USER root
 
-ARG URL_LLM
-ARG FILE_LLM
+ARG LLM_URL
+ARG LLM_FILE
 
 # Instalamos dependencias necesarias y borramos el almacen temporal de apt /var/lib/lists/*
 RUN apt-get update && apt-get install -y \
@@ -53,7 +54,7 @@ RUN cmake -S . -B build \
 RUN cmake --build build -- -j $(nproc)
 
 # Copiamos el modelo (opcional: puedes montarlo como volumen)
-RUN wget -O /app/llama.cpp/models/${FILE_LLM} ${URL_LLM}
+RUN wget -O /app/llama.cpp/models/${LLM_FILE} ${LLM_URL}
 
 # Puerto para el servidor de inferencia
 EXPOSE 8080
