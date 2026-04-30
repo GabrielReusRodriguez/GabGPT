@@ -3,19 +3,19 @@
 # Con esta instrucción ejecuto el docker que servirá la API para via web.
 
 # En que carpeta está el modelo?
-: ${HOST_MODELS_FOLDER:='/home/gabriel/Downloads'}
+#: ${HOST_MODELS_FOLDER:='/home/gabriel/Downloads'}
 # Cual es el nombre del fichero del modelo?
-: ${MODEL_FILE:='Qwen3-14B-Q5_K_M.gguf'}
+#: ${MODEL_FILE:='Qwen3-14B-Q5_K_M.gguf'}
 # Puerto que expone el docker.
-: ${DOCKER_PORT:=8080}
+#: ${DOCKER_PORT:=8080}
 # Puerto que ofrecemos hacia afuera (mapea el docker_port)
-: ${HOST_PORT:=8080}
+#: ${HOST_PORT:=8080}
 # Número de capas que ejecutará la GPU 
-: ${LLM_NUMBER_GPU_LAYERS:=99}
+#: ${LLM_NUMBER_GPU_LAYERS:=99}
 # Tamaño del contexto
-: ${LLM_CONTEXT_SIZE:=4096}
+#: ${LLM_CONTEXT_SIZE:=4096}
 # Nombre de la imagen Docker que usaremos.
-: ${DOCKER_IMAGE_NAME:='llama-cpp-qwen'}
+#: ${DOCKER_IMAGE_NAME:='llama-cpp-qwen'}
 
 : '
     Los parámetros utilizados son:
@@ -49,11 +49,11 @@ docker run -it                  \
         --group-add video       \
         --ipc=host              \
         --shm-size 8g           \
-        --publish   ${DOCKER_PORT}:${HOST_PORT}   \
+        --publish   ${DOCKER_GUEST_PORT}:${DOCKER_HOST_PORT}   \
 #        --volume ${HOST_MODELS_FOLDER}/${MODEL_FILE}:/app/llama.cpp/models/${MODEL_FILE}    \
-        --env  MODEL_PATH=/app/llama.cpp/models/${MODEL_FILE}  \
-        --env  N_GPU_LAYERS=${LLM_NUMBER_GPU_LAYERS} \
-        --env  CTX_SIZE=${LLM_CONTEXT_SIZE}   \
-        ${DOCKER_IMAGE_NAME}
+        --env  MODEL_PATH=${LLAMA_LLM_MODEL_PATH}  \
+        --env  N_GPU_LAYERS=${LLAMA_GPU_CFG_NUM_GPU_LAYERS} \
+        --env  CTX_SIZE=${LLAMA_LLM_CTX_SIZE}   \
+        ${LLAMA_DOCKER_IMG_NAME}
 
 # Si descargamos el modelo en la Dockerfile no hace falta montar el volumen.

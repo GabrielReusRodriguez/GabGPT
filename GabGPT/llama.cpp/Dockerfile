@@ -37,19 +37,19 @@ WORKDIR /app/llama.cpp
 RUN /app/scripts/llama_optimized_compilation.sh
 
 # Puerto para el servidor de inferencia
-EXPOSE 8080
+# EXPOSE 8080
 
 # Declaramos las variables de entorno necesarias para runtime
 # Aquí indicamos que ids de gpu es la que queremos que vea, podemos ver el listado de gpus con rocm-smi y rocminfo (chip ID)
-ENV HIP_VISIBLE_DEVICES=0
+#ENV HIP_VISIBLE_DEVICES=0
 # Forzamos el uso de memoria Pinned para OCulink.
-ENV GGML_HIP_ALLOC_GRAPH=1
+#ENV GGML_HIP_ALLOC_GRAPH=1
 # Para forzar la ejecución de la arquitectura RDNA4
-ENV HSA_OVERRIDE_GFX_VERSION=12.0.0
+#ENV HSA_OVERRIDE_GFX_VERSION=12.0.0
 
 COPY ./scripts/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Copiamos el modelo (opcional: puedes montarlo como volumen)
-RUN wget -O /app/llama.cpp/models/${LLM_FILE} ${LLM_URL}
+RUN wget -O /app/llama.cpp/models/${LLAMA_LLM_FILE} ${LLAMA_LLM_URL}

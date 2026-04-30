@@ -18,7 +18,7 @@ cmake -S . -B build \
         # Todo lo que vaya con -DGGML son flags para la libreria matematica que usa llama.cpp
         -DGGML_CUDA=OFF \
         -DGGML_HIP=ON \
-        -DGGML_HIP_TARGETS=gfx1200 \
+        -DGGML_HIP_TARGETS=${LLAMA_CFG_AMDGPU_TARGETS} \
         -DGGML_FAST_MATH=ON \
         -DGGML_CUDA_FORCE_MMAP=ON \
         -DGGML_HIP_UMA=OFF \
@@ -26,7 +26,7 @@ cmake -S . -B build \
         -DGGML_AVX512=ON \
         -DGGML_AVX512_VBMI=ON \
         -DGGML_AVX512_VNNI=ON \
-        -DAMDGPU_TARGETS=gfx1200    \
+        -DAMDGPU_TARGETS=${LLAMA_CFG_AMDGPU_TARGETS}    \
 #        -DLLAMA_OPENSSL=ON \
 #        -DCMAKE_PREFIX_PATH=${ROCM_PATH} \
         -DCMAKE_BUILD_TYPE=Release \
