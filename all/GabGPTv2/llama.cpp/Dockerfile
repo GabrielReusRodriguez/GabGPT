@@ -34,7 +34,7 @@ RUN /app/scripts/llama_optimized_compilation.sh
 
 
 # Copiamos el modelo (opcional: puedes montarlo como volumen)
-ENV LLAMA_LLM_MODEL_PATH="/app/llama.cpp/models/${LLAMA_LLM_FILE}"
+ENV LLAMA_LLM_MODEL_PATH="/app/llama.cpp/models/${LLM_FILE}"
 RUN wget -O $LLAMA_LLM_MODEL_PATH ${LLM_URL}
 
 COPY ./scripts/entrypoint.sh /entrypoint.sh
