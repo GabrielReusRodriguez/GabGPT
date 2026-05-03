@@ -17,11 +17,11 @@
 
 # Ejecutamos el servidor
 exec /app/llama.cpp/build/bin/llama-server \
-    --model "${LLAMA_LLM_MODEL_PATH}" \
+    --model "${LLM_MODEL_PATH}" \
     #--host 0.0.0.0 \
     --host 127.0.0.1 \
     --port ${LLAMA_DOCKER_CONTAINER_PORT} \
     --mlock \
     --flash-attn on \
     --n-gpu-layers "${LLAMA_GPU_CFG_NUM_GPU_LAYERS}" \
-    --ctx-size "${LLAMA_LLM_CTX_SIZE}"
+    --ctx-size "${LLM_CTX_SIZE}"

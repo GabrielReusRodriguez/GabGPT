@@ -4,20 +4,22 @@ services:
     build:
       context: ./llama.cpp
       dockerfile: Dockerfile
-    command: ["-shm-size 8g","--ipc=host"]
+      args:
+        # Aquí mapeamos la variable del .env al argumento del Dockerfile
+        - AMDGPU_TARGETS=${AMDGPU_TARGETS}
+    command: ["-shm-size 8g","--ipc=host"]    
     env_file:
-      - ./llama.cpp/.env.docker
+      # - ./llama.cpp/.env.docker
       - ./llama.cpp/.env.llama
       - ./llama.cpp/.env.llm
     container_name: llamacpp
     restart: unless-stopped
     ports:
       - "${LLAMA_DOCKER_HOST_PORT}:${LLAMA_DOCKER_CONTAINER_PORT}"  # Puerto interno de la API de llama.cpp
-    #volumes:
-    #  - ./llama.cpp/models:/app/models  # Monta los modelos locales
-    #environment:
-    #  - MODEL_PATH=/app/models/llama-2-7b.Q4_K_M.gguf  # Ajusta según tu modelo
-    #command: ["--host", "0.0.0.0", "--port", "8080", "--model", "/app/models/llama-2-7b.Q4_K_M.gguf"]  
+    volumes:
+      - ${MODELS_FOLDER}:/app/models  # Monta los modelos locales
+    environment:
+      - MODEL_PATH=${MODELS_FOLDER}/${MODEL_FILE}  #Modelo
 
   # Servicio de Nginx (proxy inverso con autenticación por API-KEY)
   nginx:
@@ -47,7 +49,7 @@ services:
     ports:
       - "${OPENWEB_UI_HOST_PORT}:${OPENWEB_UI_CONTAINER_PORT}"  # Puerto interno de Open WebUI
     volumes:
-      - ${OPENWEB_UI_DATA_PATH}/open-webui/data:/app/backend/data  # Persistencia de datos
+      - ${OPENWEB_UI_DATA_PATH}:/app/backend/data  # Persistencia de datos
     environment:
       - OLLAMA_BASE_URL=${LLM_SERVER_URL}  # Apunta a Nginx como proxy
     networks:

@@ -4,11 +4,9 @@
 #FROM rocm/dev-ubuntu-24.04:latest
 FROM rocm/rocm-terminal:latest
 
-USER root
+ARG AMDGPU_TARGETS
 
-# Para que Dockerfile reciba las variables del docker-compose.yml
-ARG LLM_FILE
-ARG LLM_URL
+USER root
 
 # Instalamos dependencias necesarias y borramos el almacen temporal de apt /var/lib/lists/*
 RUN apt-get update && apt-get install -y \
@@ -37,11 +35,11 @@ WORKDIR /app/llama.cpp
 RUN /app/scripts/llama_optimized_compilation.sh
 
 # Cramos la carpeta
-RUN mkdir -p /app/llama.cpp/models
+#RUN mkdir -p /app/llama.cpp/models
 
 # Copiamos el modelo (opcional: puedes montarlo como volumen)
-ENV LLAMA_LLM_MODEL_PATH="/app/llama.cpp/models/${LLM_FILE}"
-RUN wget -O $LLAMA_LLM_MODEL_PATH ${LLM_URL}
+#ENV LLAMA_LLM_MODEL_PATH="/app/llama.cpp/models/${LLM_FILE}"
+#RUN wget -O $LLAMA_LLM_MODEL_PATH ${LLM_URL}
 
 COPY ./scripts/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
