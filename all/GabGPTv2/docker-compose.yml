@@ -25,6 +25,8 @@ services:
     build:
       context: ./nginx
     container_name: nginx
+    env_file:
+      - ./nginx/.env.nginx
     restart: unless-stopped
     ports:
       - "${NGINX_HOST_HTTP_PORT}:${NGINX_CONTAINER_HTTP_PORT}"
@@ -38,6 +40,23 @@ services:
     #  - API_KEY=tu_api_key_secreta  # Cambia esto por tu API-KEY
     networks:
       - app_network
+
+  # Servicio de Open WebUI
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: openwebui
+    restart: unless-stopped
+    env_file:
+      - ./OpenWebUI/.env.openweb
+    ports:
+      - "${OPENWEB_UI_HOST_PORT}:${OPENWEB_UI_CONTAINER_PORT}"  # Puerto interno de Open WebUI
+    volumes:
+      - ${OPENWEB_UI_DATA_PATH}/open-webui/data:/app/backend/data  # Persistencia de datos
+    environment:
+      - OLLAMA_BASE_URL=${LLM_SERVER_URL}  # Apunta a Nginx como proxy
+    networks:
+      - app_network
+
 
 networks:
   app_network:
