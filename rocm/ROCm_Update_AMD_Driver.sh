@@ -11,7 +11,7 @@
 # Paso 1. Actualizar el kernel
 # 1.1 Para ello, actualizo los repos de ubuntu
 
-#https://repo.radeon.com/amdgpu-install/25.35.1/ubuntu/noble/amdgpu-install_7.2.1.70201-1_all.deb
+# Consultar el último driver disponible en: https://repo.radeon.com/amdgpu-install/latest/ubuntu/noble/
 wget https://repo.radeon.com/amdgpu-install/7.2.2/ubuntu/noble/amdgpu-install_7.2.2.70202-1_all.deb
 sudo apt install ./amdgpu-install_7.2.2.70202-1_all.deb
 sudo sed -i "s|graphics/7.2.2|graphics/7.2.1|" /etc/apt/sources.list.d/rocm.list

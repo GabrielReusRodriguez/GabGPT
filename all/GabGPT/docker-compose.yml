@@ -1,36 +1,51 @@
 services:
+
+
   # Servicio de llama.cpp
   llamacpp:
     build:
       context: ./llama.cpp
       dockerfile: Dockerfile
-    env_file:
-      - .env.docker
-      - .env.llama
-      - .env.llm
-    container_name: llamacpp
+      args:
+        # Aquí mapeamos la variable del .env al argumento del Dockerfile
+        - AMDGPU_TARGETS=${AMDGPU_TARGETS}
+    # command: ["-shm-size 8g","--ipc=host"]    
+    #env_file:
+      # - ./llama.cpp/.env.docker
+      #- ./llama.cpp/.env.llama
+      #- ./llama.cpp/.env.llm
+    container_name: llama.cpp
     restart: unless-stopped
-    ports:
-      - "8080:8080"  # Puerto interno de la API de llama.cpp
-    #volumes:
-    #  - ./llama.cpp/models:/app/models  # Monta los modelos locales
-    #environment:
-    #  - MODEL_PATH=/app/models/llama-2-7b.Q4_K_M.gguf  # Ajusta según tu modelo
-    #command: ["--host", "0.0.0.0", "--port", "8080", "--model", "/app/models/llama-2-7b.Q4_K_M.gguf"]
+    devices:
+      - "/dev/kfd:/dev/kfd"    # Interfaz de computación AMD
+      - "/dev/dri:/dev/dri"    # Renderizado directo
+        #    group_add:
+        #- video                  # Permisos para acceder al hardware de video
+        #- render
+    ipc : host      # Optimizacion: Comparte el espacio de memoria interproceso con el host. El contenedor puede acceder a recursos del host como semaforos, memoria compartida...
+    shm_size: 8g    # Optimizacion: Define el tamaño de la memoria compartida. Los procesos comparten memoria directamente en la memoria, sin tener que copiarlos.
+    security_opt:
+      - seccomp:unconfined     # A veces necesario para ROCm
+    expose:
+      - ${LLAMACPP_CONTAINER_PORT}  # Con Expose evitamos que haya un puerto hacia afuera del contenedor asi que solo se puden ver entre los del contenedor.
+    volumes:
+      - ${LLAMACPP_HOST_MODELS_FOLDER}:${LLAMACPP_CONTAINER_MODELS_FOLDER}  # Monta los modelos locales
     networks:
       - app_network
+
 
   # Servicio de Nginx (proxy inverso con autenticación por API-KEY)
   nginx:
     image: nginx:alpine
-    build:
-      context: ./nginx
-    container_name: nginx
+      #    build:
+      #context: ./nginx
+    container_name: nginx-landing
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"  # Opcional: si usas HTTPS
+      - "${NGINX_HOST_HTTP_PORT}:${NGINX_CONTAINER_HTTP_PORT}"
+      - "${NGINX_HOST_HTTPS_PORT}:${NGINX_CONTAINER_HTTPS_PORT}"  # Opcional: si usas HTTPS
     depends_on:
+      - openwebui
       - llamacpp
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
@@ -46,13 +61,16 @@ services:
     container_name: openwebui
     restart: unless-stopped
     ports:
-      - "8081:8080"  # Puerto interno de Open WebUI
+      - "${OPENWEB_UI_HOST_PORT}:${OPENWEB_UI_CONTAINER_PORT}"  # Puerto interno de Open WebUI
+    depends_on: 
+      - llamacpp
     volumes:
-      - ./open-webui/data:/app/backend/data  # Persistencia de datos
+      - ${OPENWEB_UI_DATA_PATH}:/app/backend/data  # Persistencia de datos
     environment:
-      - OLLAMA_BASE_URL=http://nginx/api  # Apunta a Nginx como proxy
-    depends_on:
-      - nginx
+      #- OLLAMA_BASE_URL=${LLM_SERVER_URL}  # Apunta a Nginx como proxy
+      - OPENAI_API_BASE_URL=${LLM_SERVER_URL}  # Apunta a Nginx como proxy
+      - OPENAI_API_KEY=api_key_openai
+      - WEBUI_SECRET_KEY=misupersecretokey
     networks:
       - app_network
 

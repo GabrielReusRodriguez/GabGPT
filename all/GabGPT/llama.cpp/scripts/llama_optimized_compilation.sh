@@ -12,31 +12,39 @@
         Ubuntu 24.0
 '
 
-: ${LLAMA_CFG_AMDGPU_TARGETS:=gfx1200}
+: '
+        Explicacion de los flags
+        -DGGML_FAST_MM_F16=ON  Habilita multiplicaciones de matrices rapidas en media precisión. RDNA 3/4 es donde brillan.
+        -DGGML_HIPBLAS=ON Activa el soporte para kernels AMD.
+
+'
+
 : ${ROCM_PATH:=/opt/rocm}
 : ${LD_LIBRARY:=${ROC_PATH}/lib:${LD_LIBRARY_PATH}}
 
 
 # Compilamos llama.cpp con soporte para ROCm (AMD GPU)
 # Añade aquí tus flags personalizadas para el compilador
+# Todo lo que vaya con -DGGML son flags para la libreria matematica que usa llama.cpp
 cmake -S . -B build \
-        # Todo lo que vaya con -DGGML son flags para la libreria matematica que usa llama.cpp
         -DGGML_CUDA=OFF \
         -DGGML_HIP=ON \
-        -DGGML_HIP_TARGETS=${LLAMA_CFG_AMDGPU_TARGETS} \
+        -DGGML_HIPBLAS=ON \
+        -DGGML_HIP_TARGETS=${AMDGPU_TARGETS} \
         -DGGML_FAST_MATH=ON \
+        -DGGML_FAST_MM_F16=ON \
         -DGGML_CUDA_FORCE_MMAP=ON \
         -DGGML_HIP_UMA=OFF \
         -DGGML_NATIVE=ON \
         -DGGML_AVX512=ON \
         -DGGML_AVX512_VBMI=ON \
         -DGGML_AVX512_VNNI=ON \
-        -DAMDGPU_TARGETS=${LLAMA_CFG_AMDGPU_TARGETS}    \
-#        -DLLAMA_OPENSSL=ON \
-#        -DCMAKE_PREFIX_PATH=${ROCM_PATH} \
+        -DAMDGPU_TARGETS=${AMDGPU_TARGETS}    \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_C_COMPILER=${ROCM_PATH}/llvm/bin/clang \
-        -DCMAKE_CXX_COMPILER=${ROCM_PATH}/llvm/bin/clang++ 
+        -DCMAKE_CXX_COMPILER=${ROCM_PATH}/llvm/bin/clang++ \
+        -DCMAKE_CXX_FLAGS="-O3 -march=native -flto  -cl-denorms-are-zero -mllvm -amdgpu-early-inline-all=true -mllvm -amdgpu-function-calls=false"
+
 
 # TODO: en principio el prefix path no deberia ser necesario. probar...
 

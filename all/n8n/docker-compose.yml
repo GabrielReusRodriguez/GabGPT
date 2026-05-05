@@ -1,0 +1,16 @@
+services:
+  n8n:
+    image: n8nio/n8n
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - ${N8N_PORT}:${N8N_PORT}
+    volumes:
+      - ${N8N_CONTAINER_DATA_PATH}:/home/node/.n8n  # Persiste los datos de n8n (flujos)
+
+#    networks:
+#      - app_network
+
+#networks:
+#  app_network:
+#    driver: bridge
