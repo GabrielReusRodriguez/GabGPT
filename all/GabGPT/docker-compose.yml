@@ -1,7 +1,7 @@
 services:
-
-
+  
   # Servicio de llama.cpp
+  # ****************************************************************
   llamacpp:
     build:
       context: ./llama.cpp
@@ -10,12 +10,25 @@ services:
         # Aquí mapeamos la variable del .env al argumento del Dockerfile
         - AMDGPU_TARGETS=${AMDGPU_TARGETS}
     # command: ["-shm-size 8g","--ipc=host"]    
-    #env_file:
-      # - ./llama.cpp/.env.docker
+    env_file:
+      - ./llama.cpp/.env.llama
       #- ./llama.cpp/.env.llama
       #- ./llama.cpp/.env.llm
     container_name: llama.cpp
     restart: unless-stopped
+    environment:
+      - LLAMA_ARG_PORT = ${LLAMACPP_CONTAINER_PORT}
+      - LLAMA_ARG_MODEL = ${LLAMACPP_MODEL_2_RUN}
+      - HSA_OVERRIDE_GFX_VERSION = ${HSA_OVERRIDE_GFX_VERSION}
+
+      #- LLAMA_ARG_CTX_SIZE = ${LLAMACPP_MODEL_CTX_SIZE}
+      #- LLAMA_ARG_N_GPU_LAYERS = ${GPU_CFG_NUM_LAYERS}
+      #- LLAMA_ARG_THREADS = ${CPU_CFG_NUM_THREADS}
+      #- ROC_ENABLE_PREFETCH = ${ROCB_ENABLE_PREFETCH}
+      #- GGML_HIP_ALLOC_GRAPH = ${GGML_HIP_ALLOC_GRAPH}
+      #- HIP_VISIBLE_DEVICES = ${HIP_VISIBLE_DEVICES}
+    env-file:
+      - ./llama.cpp/.env.llama
     devices:
       - "/dev/kfd:/dev/kfd"    # Interfaz de computación AMD
       - "/dev/dri:/dev/dri"    # Renderizado directo
@@ -35,6 +48,7 @@ services:
 
 
   # Servicio de Nginx (proxy inverso con autenticación por API-KEY)
+  # ****************************************************************
   nginx:
     image: nginx:alpine
       #    build:
@@ -56,6 +70,7 @@ services:
       - app_network
 
   # Servicio de Open WebUI
+  # ****************************************************************
   openwebui:
     image: ghcr.io/open-webui/open-webui:main
     container_name: openwebui
