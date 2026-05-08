@@ -10,10 +10,6 @@ services:
         # Aquí mapeamos la variable del .env al argumento del Dockerfile
         - AMDGPU_TARGETS=${AMDGPU_TARGETS}
     # command: ["-shm-size 8g","--ipc=host"]    
-    env_file:
-      - ./llama.cpp/.env.llama
-      #- ./llama.cpp/.env.llama
-      #- ./llama.cpp/.env.llm
     container_name: llama.cpp
     restart: unless-stopped
     environment:
