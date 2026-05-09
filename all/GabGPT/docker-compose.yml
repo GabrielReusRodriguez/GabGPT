@@ -69,7 +69,7 @@ services:
     depends_on: 
       - llamacpp
     env_file:
-      - .${GABGPT_SECRET_FOLDER}/.env.openwebui
+      - ${GABGPT_SECRET_FOLDER}/.env.openwebui
     volumes:
       - ${OPENWEBUI_DATA_PATH}:/app/backend/data  # Persistencia de datos
     environment:
