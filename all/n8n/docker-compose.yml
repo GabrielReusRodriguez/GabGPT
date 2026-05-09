@@ -3,10 +3,42 @@ services:
     image: n8nio/n8n
     container_name: n8n
     restart: unless-stopped
+    environment:
+      - N8N_HOST=wopr.lan
+      - N8N_PROTOCOL=${N8N_PROTOCOL}
+      - N8N:PORT=${N8N_PORT}
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://wopr.lan:4431/
     ports:
       - ${N8N_PORT}:${N8N_PORT}
     volumes:
       - ${N8N_CONTAINER_DATA_PATH}:/home/node/.n8n  # Persiste los datos de n8n (flujos)
+    networks:
+      - n8n_net
+
+  caddy:
+    image: caddy:latest
+    ports:
+      - "801:80"
+      - "4431:4431"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - /mnt/datos/caddyfile/:/data
+    restart: unless-stopped
+    networks:
+      - n8n_net
+
+networks:
+  n8n_net:
+    driver: bridge
+
+volumes:
+  caddyfile:
+
+
+
+
+
 
 #    networks:
 #      - app_network
