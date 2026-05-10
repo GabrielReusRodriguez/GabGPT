@@ -47,7 +47,6 @@ services:
     profiles: ['nginx']
     ports:
       - "${NGINX_HOST_HTTP_PORT}:${NGINX_CONTAINER_HTTP_PORT}"
-      #- "${NGINX_HOST_HTTPS_PORT}:${NGINX_CONTAINER_HTTPS_PORT}"  # Opcional: si usas HTTPS
     depends_on:
       - openwebui
       - llamacpp
@@ -101,16 +100,15 @@ services:
       - N8N_PROTOCOL=${N8N_PROTOCOL}
       - N8N_PORT=${N8N_PORT}
       - NODE_ENV=production
-      - WEBHOOK_URL=https://n8n:443/
-        #- N8N_CONTAINER_DATA_PATH=${N8N_CONTAINER_DATA_PATH}
-    #ports:
-    #  - ${N8N_PORT}:${N8N_PORT}
+      - WEBHOOK_URL=https://wopr.lan/n8n/
+      - N8N_PATH=/n8n/
+      - N8N_EDITOR_BASE_URL=https://wopr.lan/n8n/
     expose:
       - ${N8N_PORT}
     volumes:
       - ${N8N_CONTAINER_DATA_PATH}:/home/node/.n8n  # Persiste los datos de n8n (flujos)
     networks:
-      - bridge
+      - app_network
   
   # Servicio de Nginx (proxy inverso con autenticación por API-KEY)
   # ****************************************************************
