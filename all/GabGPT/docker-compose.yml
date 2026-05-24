@@ -16,6 +16,7 @@ services:
     environment:
       - LLAMA_ARG_PORT=${LLAMACPP_CONTAINER_PORT}
       - LLAMA_ARG_MODEL=${LLAMACPP_MODEL_2_RUN}
+      - LLAMA_ARG_ALIAS=${LLAMACPP_ARG_ALIAS}
       - HSA_OVERRIDE_GFX_VERSION=${HSA_OVERRIDE_GFX_VERSION}
     env_file:
       - ${GABGPT_SECRET_FOLDER}/.env.llama
@@ -24,7 +25,7 @@ services:
       #- HIP1
       - "/dev/kfd:/dev/kfd"    # Interfaz de computación AMD
       - "/dev/dri:/dev/dri"    # Renderizado directo
-        # group_add:
+        #group_add:
         #- video                  # Permisos para acceder al hardware de video
         #- render
     ipc : host      # Optimizacion: Comparte el espacio de memoria interproceso con el host. El contenedor puede acceder a recursos del host como semaforos, memoria compartida...

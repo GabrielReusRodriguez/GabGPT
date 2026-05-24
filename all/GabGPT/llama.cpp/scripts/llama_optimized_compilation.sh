@@ -30,6 +30,10 @@
 # -DGGML_VULKAN=ON \
 # -DGGML_HIP_UMA=OFF
 # -DGGML_HIP_VMM= SIN
+#
+#-DCMAKE_C_COMPILER=${ROCM_PATH}/llvm/bin/clang \
+#        -DCMAKE_CXX_COMPILER=${ROCM_PATH}/llvm/bin/clang++ \
+
 cmake -S . -B build \
         -DGGML_CUDA=OFF \
         -DGGML_HIP=ON \
@@ -46,8 +50,8 @@ cmake -S . -B build \
         -DGGML_AVX512_VNNI=ON \
         -DAMDGPU_TARGETS=${AMDGPU_TARGETS}    \
         -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_C_COMPILER=${ROCM_PATH}/llvm/bin/clang \
-        -DCMAKE_CXX_COMPILER=${ROCM_PATH}/llvm/bin/clang++ \
+        -DCMAKE_C_COMPILER=${ROCM_PATH}/bin/hipcc \
+        -DCMAKE_CXX_COMPILER=${ROCM_PATH}/bin/hipcc \
         -DCMAKE_CXX_FLAGS="-O3 -march=native -flto  -cl-denorms-are-zero -mllvm -amdgpu-early-inline-all=true -mllvm -amdgpu-function-calls=false"
 
 
