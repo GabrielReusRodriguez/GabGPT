@@ -34,7 +34,4 @@ RUN chmod +x /app/scripts/llama_optimized_compilation.sh
 WORKDIR /app/llama.cpp
 RUN /app/scripts/llama_optimized_compilation.sh
 
-COPY ./scripts/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
 

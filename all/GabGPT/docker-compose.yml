@@ -15,6 +15,7 @@ services:
     environment:
       - LLAMA_ARG_PORT=${LLAMACPP_CONTAINER_PORT}
       - HSA_OVERRIDE_GFX_VERSION=${HSA_OVERRIDE_GFX_VERSION}
+      - LLAMACPP_CONTAINER_MODELS_FOLDER=${LLAMACPP_CONTAINER_MODELS_FOLDER}
     env_file:
       - ${GABGPT_SECRET_FOLDER}/.env.llama
     devices:
@@ -33,6 +34,10 @@ services:
       - ${LLAMACPP_CONTAINER_PORT}  # Con Expose evitamos que haya un puerto hacia afuera del contenedor asi que solo se puden ver entre los del contenedor.
     volumes:
       - ${LLAMACPP_HOST_MODELS_FOLDER}:${LLAMACPP_CONTAINER_MODELS_FOLDER}  # Monta los modelos locales
+      - ./llama.cpp/scripts:/app/scripts/
+        #entrypoint: ["sh", "-c", "source /app/scripts/import_env.sh && source /app/scripts/load_model.sh"]
+    entrypoint: ["/bin/bash", "-c"]
+    command: "'source /app/scripts/import_env.sh && source /app/scripts/load_model.sh'"
     networks:
       - app_network
 
