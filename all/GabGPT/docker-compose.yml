@@ -13,9 +13,9 @@ services:
     container_name: llama.cpp
     restart: unless-stopped
     environment:
-      - LLAMA_ARG_PORT=${LLAMACPP_CONTAINER_PORT}
+      - LLAMA_ARG_PORT=${LLAMACPP_GUEST_PORT}
       - HSA_OVERRIDE_GFX_VERSION=${HSA_OVERRIDE_GFX_VERSION}
-      - LLAMACPP_CONTAINER_MODELS_FOLDER=${LLAMACPP_CONTAINER_MODELS_FOLDER}
+      - GABGPT_GUEST_MODELS_FOLDER=${GABGPT_GUEST_MODELS_FOLDER}
     env_file:
       - ${GABGPT_SECRET_FOLDER}/.env.llama
     devices:
@@ -31,11 +31,10 @@ services:
     cap_add:
       - SYS_PTRACE
     expose:
-      - ${LLAMACPP_CONTAINER_PORT}  # Con Expose evitamos que haya un puerto hacia afuera del contenedor asi que solo se puden ver entre los del contenedor.
+      - ${LLAMACPP_GUEST_PORT}  # Con Expose evitamos que haya un puerto hacia afuera del contenedor asi que solo se puden ver entre los del contenedor.
     volumes:
-      - ${LLAMACPP_HOST_MODELS_FOLDER}:${LLAMACPP_CONTAINER_MODELS_FOLDER}  # Monta los modelos locales
+      - ${GABGPT_HOST_MODELS_FOLDER}:${GABGPT_GUEST_MODELS_FOLDER}  # Monta los modelos locales
       - ./llama.cpp/scripts:/app/scripts/
-        #entrypoint: ["sh", "-c", "source /app/scripts/import_env.sh && source /app/scripts/load_model.sh"]
     entrypoint: ["/bin/bash", "-c"]
     command: "'source /app/scripts/import_env.sh && source /app/scripts/load_model.sh'"
     networks:
@@ -52,7 +51,7 @@ services:
     restart: unless-stopped
     profiles: ['nginx']
     ports:
-      - "${NGINX_HOST_HTTP_PORT}:${NGINX_CONTAINER_HTTP_PORT}"
+      - "${NGINX_HOST_HTTP_PORT}:${NGINX_GUEST_HTTP_PORT}"
     depends_on:
       - openwebui
       - llamacpp
@@ -71,7 +70,7 @@ services:
     container_name: openwebui
     restart: unless-stopped
     ports:
-      - "${OPENWEBUI_HOST_PORT}:${OPENWEBUI_CONTAINER_PORT}"  # Puerto interno de Open WebUI
+      - "${OPENWEBUI_HOST_PORT}:${OPENWEBUI_GUEST_PORT}"  # Puerto interno de Open WebUI
         #    expose:
         #- ${OPENWEBUI_CONTAINER_PORT}
     depends_on: 
@@ -112,7 +111,7 @@ services:
     expose:
       - ${N8N_PORT}
     volumes:
-      - ${N8N_CONTAINER_DATA_PATH}:/home/node/.n8n  # Persiste los datos de n8n (flujos)
+      - ${N8N_GUEST_DATA_PATH}:/home/node/.n8n  # Persiste los datos de n8n (flujos)
     networks:
       - app_network
   
