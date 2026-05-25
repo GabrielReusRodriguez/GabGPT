@@ -17,4 +17,4 @@ exec /app/llama.cpp/build/bin/llama-server \
 #exec /app/llama.cpp/build/bin/llama-cli --list-devices
 
 
-exec /app/llama.cpp/build/bin/llama-server
+exec /app/llama.cpp/build/bin/llama-server --log-disable

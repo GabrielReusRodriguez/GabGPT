@@ -1,8 +1,8 @@
 # https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html
 
 # Usamos una imagen base con ROCm (para AMD GPU)
-#FROM rocm/dev-ubuntu-24.04:latest
-FROM rocm/rocm-terminal:latest
+FROM rocm/dev-ubuntu-24.04:latest
+#FROM rocm/:latest
 
 ARG AMDGPU_TARGETS
 
@@ -18,8 +18,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 
-
-
+RUN apt upgrade -y
 
 
 # Clonamos el repositorio de llama.cpp

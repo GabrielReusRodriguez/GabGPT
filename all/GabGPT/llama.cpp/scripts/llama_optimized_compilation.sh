@@ -22,6 +22,8 @@
 : ${ROCM_PATH:=/opt/rocm}
 : ${LD_LIBRARY:=${ROC_PATH}/lib:${LD_LIBRARY_PATH}}
 
+#$ROCM_PATH=/opt/rocm2
+#$LD_LIBRARY=${ROC_PATH}/lib:${LD_LIBRARY_PATH}
 
 # Compilamos llama.cpp con soporte para ROCm (AMD GPU)
 # Añade aquí tus flags personalizadas para el compilador
@@ -52,6 +54,7 @@ cmake -S . -B build \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_C_COMPILER=${ROCM_PATH}/bin/hipcc \
         -DCMAKE_CXX_COMPILER=${ROCM_PATH}/bin/hipcc \
+	-DCMAKE_PREFIX_PATH=${ROCM_PATH} \
         -DCMAKE_CXX_FLAGS="-O3 -march=native -flto  -cl-denorms-are-zero -mllvm -amdgpu-early-inline-all=true -mllvm -amdgpu-function-calls=false"
 
 
