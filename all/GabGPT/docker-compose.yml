@@ -4,13 +4,14 @@ services:
   # ****************************************************************
   llamacpp:
     build:
-      context: ./llama.cpp
+      context: ./engines/llama.cpp
       dockerfile: Dockerfile
       args:
         # Aquí mapeamos la variable del .env al argumento del Dockerfile
         - AMDGPU_TARGETS=${AMDGPU_TARGETS}
     privileged: true
     container_name: llama.cpp
+    profiles: ['llama.cpp']
     restart: unless-stopped
     environment:
       - LLAMA_ARG_PORT=${LLAMACPP_GUEST_PORT}
@@ -41,6 +42,66 @@ services:
       - app_network
 
 
+  # Servicio de FastFlowLLM - Engine de LLM
+  # ****************************************************************
+  fastflowlm:
+    build:
+      context: ./engines/FastFlowLM
+      dockerfile: Dockerfile
+      args: 
+        - BASE_IMAGE=ubuntu:24.04
+    container_name: fastflowlm
+    profiles: ['fastflowlm']
+    entrypoint: ["/bin/bash", "-c"]
+    networks:
+      - app_network
+
+
+  # Servicio de Lemonade-server.ai - Engine de LLM con soporte de AMD
+  # ****************************************************************
+  lemonade:
+      build:
+        context: ./engines/lemonade-server
+        dockerfile: Dockerfile
+      #image: ghcr.io/lemonade-sdk/lemonade-server:latest
+      container_name: lemonade-server
+      profiles: ['lemonade-server']
+      restart: unless-stopped
+      environment:
+        #- LEMONADE_HOST=127.0.0.1
+        #- LEMONADE_PORT=13305
+        #- LEMONADE_API_KEY=your-api-key-here
+        - LEMONADE_LLAMACPP=rocm
+        - XDG_RUNTIME_DIR=/tmp/
+        - XDG_CACHE_HOME=/app/lemonade/persistencia/.cache
+        - XDG_DATA_HOME=/app/lemonade/persistencia/.data
+        - LEMONADE_CACHE_DIR=/app/lemonade/persistencia/.cache/lemonade
+        - HSA_OVERRIDE_GFX_VERSION=12.0.0
+        - HIP_VISIBLE_DEVICES=0
+      devices:
+        - "/dev/kfd:/dev/kfd"
+        - "/dev/dri:/dev/dri"
+        - "/dev/accel/accel0:/dev/accel/accel0"
+      privileged: true
+      security_opt:
+        - apparmor:unconfined
+          #@        - seccomp:unconfined     # A veces necesario para ROCm
+      ports:
+        - 13305:13305
+      volumes:
+        - /mnt/datos/lemonade/persistencia:/app/lemonade/persistencia
+          # - /mnt/datos/lemonade/xdg:/app/lemonade/xdg
+          #- /mnt/datos/lemonade/xdg:/app/lemonade/
+          #- /mnt/datos/lemonade/llama:/app/lemonade/llama
+          #- /mnt/datos/lemonade/models:/root/.cache/lm-studio/models
+          #- /mnt/datos/lemonade/recipes:/app/lemonade/.cache/recipes
+      #entrypoint: ["/bin/bash", "-c"]
+      networks:
+        - app_network
+
+
+
+
   # Servicio de Nginx (proxy inverso con autenticación por API-KEY)
   # ****************************************************************
   nginx:
@@ -63,6 +124,7 @@ services:
     networks:
       - app_network
 
+
   # Servicio de OpenWebUI
   # ****************************************************************
   openwebui:
@@ -73,8 +135,8 @@ services:
       - "${OPENWEBUI_HOST_PORT}:${OPENWEBUI_GUEST_PORT}"  # Puerto interno de Open WebUI
         #    expose:
         #- ${OPENWEBUI_CONTAINER_PORT}
-    depends_on: 
-      - llamacpp
+        #    depends_on: 
+        #- llamacpp
     env_file:
       - ${GABGPT_SECRET_FOLDER}/.env.openwebui
     volumes:
@@ -82,8 +144,8 @@ services:
     environment:
       #- OLLAMA_BASE_URL=${LLM_SERVER_URL}  # Apunta a Nginx como proxy
       - OPENAI_API_BASE_URL=${LLAMACPP_SERVER_URL}  # Apunta a Nginx como proxy
-      - OPENAI_API_KEY=api_key_openai
-      - WEBUI_SECRET_KEY=misupersecretokey
+        #- OPENAI_API_KEY=api_key_openai
+        #- WEBUI_SECRET_KEY=misupersecretokey
     networks:
       - app_network
 
@@ -99,7 +161,7 @@ services:
     image: n8nio/n8n
     container_name: n8n
     restart: unless-stopped
-    profiles: ['n8n', 'all']
+    profiles: ['n8n']
     environment:
       - N8N_HOST=n8n
       - N8N_PROTOCOL=${N8N_PROTOCOL}

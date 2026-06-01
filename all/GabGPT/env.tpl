@@ -1,27 +1,30 @@
 # --- Configuracion general ---
 # La carpeta con las variables de entorno de ejecución.
-GABGPT_SECRET_FOLDER=
+GABGPT_SECRET_FOLDER=/mnt/share/.secrets/gabgpt
+
+
 
 # --- Configuración de Llama.cpp ---
 #########################################################################
 # Puerto del contenedor
-LLAMACPP_CONTAINER_PORT=8080
+#LLAMACPP_CONTAINER_PORT=8080
+LLAMACPP_GUEST_PORT=8080
 # URL del servidor LLM
 LLAMACPP_SERVER_URL=http://llama.cpp:8080/v1
 
 # --- Modelos IA ---
 # Carpeta con los modelos de IA
-LLAMACPP_HOST_MODELS_FOLDER=
-LLAMACPP_CONTAINER_MODELS_FOLDER=
+GABGPT_HOST_MODELS_FOLDER=/mnt/datos/ai/models/ 
+GABGPT_GUEST_MODELS_FOLDER=/app/models
 
 # Fichero del modelo a cargar.
-LLAMACPP_MODEL_FILE=
+#LLAMACPP_MODEL_FILE=
 
 # Alias que aparecerá en los consumidores.
-LLAMACPP_ARG_ALIAS=
+#LLAMACPP_ARG_ALIAS=
 
 
-LLAMACPP_MODEL_2_RUN=${LLAMACPP_CONTAINER_MODELS_FOLDER}/${LLAMACPP_MODEL_FILE}
+#LLAMACPP_MODEL_2_RUN=${LLAMACPP_CONTAINER_MODELS_FOLDER}/${LLAMACPP_MODEL_FILE}
 
 # --- Arquitectura ---
 # https://github.com/ggml-org/llama.cpp/blob/fc2b0053/tools/server/README.md?plain=1#L39-L40
@@ -34,15 +37,15 @@ HSA_OVERRIDE_GFX_VERSION=12.0.0
 # --- Configuración de Nginx Frontend ---
 #########################################################################
 NGINX_HOST_HTTP_PORT=80
-NGINX_CONTAINER_HTTP_PORT=80
+NGINX_GUEST_HTTP_PORT=80
 NGINX_HOST_HTTPS_PORT=443
-NGINX_CONTAINER_HTTPS_PORT=443
+NGINX_GUEST_HTTPS_PORT=443
 
 # --- Configuración de OpenWebUI Frontend ---
 #########################################################################
 OPENWEBUI_HOST_PORT=3000
-OPENWEBUI_CONTAINER_PORT=8080
-OPENWEBUI_DATA_PATH=
+OPENWEBUI_GUEST_PORT=8080
+OPENWEBUI_DATA_PATH=/mnt/datos/openwebui
 
 
 
@@ -50,9 +53,9 @@ OPENWEBUI_DATA_PATH=
 #########################################################################
 N8N_BASIC_AUTH_ACTIVE=true  	# Activa autenticación básica
 N8N_BASIC_AUTH_USER=admin    	# Usuario para el login
-N8N_BASIC_AUTH_PASSWORD=	# Contraseña para el login
+N8N_BASIC_AUTH_PASSWORD=1234	# Contraseña para el login
 N8N_HOST=0.0.0.0             	# Permite acceso desde cualquier host
 N8N_PROTOCOL=https	    	# protocolo de acceso
 N8N_PORT=5678                	# Puerto de n8n
 NODE_ENV=production         	# Entorno de producción
-N8N_CONTAINER_DATA_PATH=	# Carpeta donde se guardan los ficheros de n8n
+N8N_GUEST_DATA_PATH=/mnt/datos/n8n_data	# Carpeta donde se guardan los ficheros de n8n
