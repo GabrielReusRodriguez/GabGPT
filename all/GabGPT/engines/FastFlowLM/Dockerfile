@@ -46,14 +46,42 @@ RUN apt update && apt install -y \
     libreadline-dev \
     libswresample-dev \
     libswscale-dev \
-    libxrt-dev \
     nasm \
     ninja-build \
     patchelf \
     pkg-config \
     uuid-dev \
-    curl \
+    curl \ 
+    software-properties-common \
     && rm -rf /var/lib/apt/lists/*
+
+#libxrt-dev \
+# los headers de xrt los instala por defecto en /usr/include/xrt y el make de fastflow los busca en /opt/xilinx/xrt... esto lo arreglamos haciendo un link simbolico.
+
+# Crear el directorio que busca CMake y enlazar las cabeceras reales
+#RUN mkdir -p /opt/xilinx/xrt/include && \
+#    ln -s /usr/include/xrt /opt/xilinx/xrt/include/xrt
+
+# 1. Creamos la base del directorio que busca el compilador
+#RUN mkdir -p /opt/xilinx/xrt
+
+# 2. Enlazamos directamente la raíz de include de Ubuntu a la de Xilinx.
+# De esta forma /usr/include/xrt se convierte en /opt/xilinx/xrt/include
+#RUN ln -s /usr/include /opt/xilinx/xrt/include
+
+
+RUN add-apt-repository ppa:lemonade-team/stable
+RUN  apt update
+RUN apt install -y libxrt-dev libxrt-npu2 amdxdna-dkms
+
+
+
+# 1. Instalar dependencias (asegúrate de que libxrt-dev está en tu apt install)
+
+# 2. Corregir enlace simbólico (limpio, apuntando al directorio raíz de cabeceras)
+RUN mkdir -p /opt/xilinx/xrt && \
+    ln -s /usr/include /opt/xilinx/xrt/include
+
 
 # Necesito el restc 1.85 y los repositorios de apt tienen hasta el 1.75 asi que lo instalo por separado.
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh  -s -- -y && \
@@ -69,11 +97,14 @@ WORKDIR /app
 # Ahora voy a compilarlo.
 
 # Clonamos el repositorio.
-RUN git clone --depth 1 --recursive https://github.com/FastFlowLM/FastFlowLM.git
+RUN git clone --depth 1 --recursive --single-branch https://github.com/FastFlowLM/FastFlowLM.git
 WORKDIR FastFlowLM/src
 
 # Configuramos la compilacion
 # Con --preset linux-default, se instalará en /opt/fastflolm
+#RUN cmake --preset linux-default -DXRT_INCLUDE_DIR=/opt/xilinx/xrt/include
+#RUN cmake --preset linux-default -DXRT_INCLUDE_DIR=/usr/include/xrt/ 
+#RUN cmake --preset linux-default -DXRT_INCLUDE_DIR=/usr/include/xrt/ -DCMAKE_CXX_FLAGS="-I/usr/include/"
 RUN cmake --preset linux-default
 
 #WORKDIR build 
@@ -87,7 +118,7 @@ RUN cmake --preset linux-default
 RUN cmake --build build -j$(nproc)
 
 # OPCIONAL:  instalamos el proyecto
-RUN sudo cmake --install build
+RUN cmake --install build
 
 
 #CMD ["/bin/bash"]

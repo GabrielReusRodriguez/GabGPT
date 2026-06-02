@@ -73,9 +73,10 @@ services:
         #- LEMONADE_API_KEY=your-api-key-here
         - LEMONADE_LLAMACPP=rocm
         - XDG_RUNTIME_DIR=/tmp/
-        - XDG_CACHE_HOME=/app/lemonade/persistencia/.cache
-        - XDG_DATA_HOME=/app/lemonade/persistencia/.data
-        - LEMONADE_CACHE_DIR=/app/lemonade/persistencia/.cache/lemonade
+          #- XDG_CACHE_HOME=/app/lemonade/persistencia/.cache
+        - XDG_CACHE_HOME=/app/lemonade/built_in/.cache
+        - XDG_DATA_HOME=/app/lemonade/built_in/.data
+          #- LEMONADE_CACHE_DIR=/app/lemonade/persistencia/huggingface
         - HSA_OVERRIDE_GFX_VERSION=12.0.0
         - HIP_VISIBLE_DEVICES=0
       devices:
@@ -89,7 +90,11 @@ services:
       ports:
         - 13305:13305
       volumes:
-        - /mnt/datos/lemonade/persistencia:/app/lemonade/persistencia
+        - /mnt/datos/lemonade/cache:/app/lemonade/persistencia/.cache
+          # Ahora el disco duro externo solo almacena los modelos, evitando problemas de permisos con ejecutables
+          #- /mnt/datos/lemonade/models:/app/lemonade/persistencia/huggingface
+        # Mantenemos los backends instalados en caliente a salvo
+        - /mnt/datos/lemonade/backends_data:/app/lemonade/built_in/.data
           # - /mnt/datos/lemonade/xdg:/app/lemonade/xdg
           #- /mnt/datos/lemonade/xdg:/app/lemonade/
           #- /mnt/datos/lemonade/llama:/app/lemonade/llama
